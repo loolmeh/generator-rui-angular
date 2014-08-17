@@ -1,0 +1,6 @@
+"""
+<%= name %> constant in the <%= module %> module
+"""
+
+angular.module('<%= module %>')
+.constant('<%= name %>', 42)

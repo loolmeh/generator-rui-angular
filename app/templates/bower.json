@@ -1,0 +1,72 @@
+{
+  "name": "<%= name %>",
+  "version": "0.0.0",
+  "authors": [
+    "<%= author %>"
+  ],
+  "license": "<%= license %>",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "<%= bower_path %>",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    <% if (router === 'ui.router') { %>
+    "ui-router": "~0.2.11",
+    <% } else if (router === 'ngRoute') { %>
+    "angular-route": "~1.3.2",
+    <% } %>
+    <% if (ss === 'sass' && _in_mods('bootstrap')) { %>
+    "bootstrap-sass-official": "~3.3.0",
+    <% } %>
+    <% if (_in_mods('ui.bootstrap')) { %>
+    "angular-bootstrap": "~0.11.2",
+    <% } %>
+    <% if (_in_mods('lodash')) { %>
+    "lodash": "~2.4.1",
+    <% } %>
+    <% if (ss === 'sass' && _in_mods('animate')) { %>
+    "animate-sass": "~0.6.2",
+    <% } %>
+    <% if ((ss ==='less' || ss === 'css') && _in_mods('bootstrap')) { %>
+    "bootstrap": "~3.3.0",
+    <% } %>
+    <% if (_in_mods('ngAria')) { %>
+    "angular-aria": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ngMessages')) { %>
+    "angular-messages": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ngCookies')) { %>
+    "angular-cookies": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ngTouch')) { %>
+    "angular-touch": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ngSanitize')) { %>
+    "angular-sanitize": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ngResource')) { %>
+    "angular-resource": "~1.3.2",
+    <% } %>
+    <% if (tst === 'assert') { %>
+    "node-assert": "*",
+    <% } %>
+    <% if ((ss === 'css' || ss === 'less') && _in_mods('animate')) { %>
+    "animate.css": "~3.2.0",
+    <% } %>
+    <% if (_in_mods('ngAnimate')) { %>
+    "angular-animate": "~1.3.2",
+    <% } %>
+    <% if (_in_mods('ui.utils')) { %>
+    "angular-ui-utils": "~0.1.1",
+    <% } %>
+    <% if (_in_mods('gettext')) { %>
+    "angular-gettext": "~1.1.4",
+    <% } %>
+    "angular-mocks": "~1.3.2"
+  }
+}

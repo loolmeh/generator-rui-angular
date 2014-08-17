@@ -1,0 +1,18 @@
+"""
+the <%= name %> directive in the <%= module %> module
+"""
+
+angular.module('<%= module %>')
+.directive('<%= name %>',
+    def():
+        return {
+        <% if (no_tpl) { %>
+            template: '<%= _escape(ml_tpl) %>',
+        <% } else { %>
+            templateUrl: '<%= tpl_path %>',
+        <% } %>
+            restrict: 'E',
+            link: def(scope, element, attrs):
+                element.text('this is the <%= name %> directive')
+        }
+)

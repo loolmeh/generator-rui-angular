@@ -1,0 +1,10 @@
+"""
+<%= name %>_ctrl controller of the <%= module %>
+"""
+
+angular.module('<%= module %>')
+.controller('<%= name %>_ctrl',
+    def($scope):
+        # do stuff with the scope
+        $scope.sth = 42
+)

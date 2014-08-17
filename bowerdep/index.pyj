@@ -1,0 +1,64 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+glob = require('glob')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:     
+    
+    @staticmethod
+    def set_deps():
+        if typeof(this.deps) == 'undefined':
+            this.deps = 'all'
+        else:
+            this.deps = this.deps.split(',')
+
+    @staticmethod
+    def get_bowerpaths():
+        bower_path = this.basic_config.bower_path
+        if this.deps == 'all':
+            this.bowerpaths = glob.sync(bower_path+'/*', {cwd: this.root_path})
+        else:
+            this.deps.push('')
+            this.bowerpaths = glob.sync(bower_path+'/{'+this.deps.join(',')+'}', {cwd: this.root_path})
+            this.bowerpaths.shift()
+
+    @staticmethod
+    def _bowerdeps(pth):
+        conf = JSON.parse(this.readFileAsString(path.join(this.root_path, pth, 'bower.json')))
+        main = conf.main
+        if typeof(main) == 'string': main = [main]
+        js = [path.join(pth, dep) for dep in main if 'js' in dep]
+        css = [path.join(pth, dep) for dep in main if 'css' in dep]
+        return js, css
+
+    @staticmethod
+    def headep_bower():
+        js_bowerdeps = []
+        css_bowerdeps = []
+        for pth in this.bowerpaths:
+            js, css = this._bowerdeps(pth)
+            js_bowerdeps = js_bowerdeps.concat(js)
+            css_bowerdeps = css_bowerdeps.concat(css)
+
+        this._ins_bmarker(
+            this.index,
+            this._headeps(js_bowerdeps, 'script', ['data-copy="true"'])+ \
+            this._headeps(css_bowerdeps, 'style', ['data-copy="true"']),
+            this.bower_marker
+            )
+
+class Bowerdep:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('deps')
+
+util.inherits(Bowerdep, Base)
+mixin(Bowerdep.prototype, BaseGen)
+mixin(Bowerdep.prototype, GenExtra)
+
+JS('module.exports') = Bowerdep

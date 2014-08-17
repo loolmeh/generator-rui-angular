@@ -1,0 +1,21 @@
+describe('<%= name %> directive',
+    def():
+        beforeEach(module('<%= module %>'))
+        
+        scope = {}
+        beforeEach(inject(
+            def($rootScope):
+                scope = $rootScope.$new()
+        ))
+        
+        it('should...', inject(
+            def($compile):
+                element = angular.element('<<%= name %>></<%= name %>>')
+                element = $compile(element)(scope)
+                <% if (tst === 'assert') { %>
+                assert(element.text() == '\n<div>\nthe <%= name %> directive \n</div>\n')
+                <% } else { %>
+                expect(element.text()).toBe('\n<div>\nthe <%= name %> directive \n</div>\n')
+                <% } %>
+        ))
+)

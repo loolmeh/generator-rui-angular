@@ -1,0 +1,21 @@
+
+describe('<%= name %>_ctrl',
+    def():
+        beforeEach(module('<%= module %>'))
+        
+        scope, ctrl = {}, {}
+        beforeEach(inject(
+            def($rootScope, $controller):
+                scope = $rootScope.$new()
+                ctrl = $controller('<%= name %>_ctrl', {$scope: scope})
+        ))
+        
+        it('should', inject(
+            def():
+                <% if (tst === 'assert') { %>
+                assert(scope.sth == 42) 
+                <% } else { %>
+                expect(scope.sth).toEqual(42) 
+                <% } %>   
+        ))
+)

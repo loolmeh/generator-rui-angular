@@ -1,0 +1,10 @@
+"""
+<%= name %> service in the <%= module %>
+"""
+
+angular.module('<%= module %>')
+.service('<%= name %>',
+    def():
+        # a new instance of this is returned to the injector
+        return 42
+)

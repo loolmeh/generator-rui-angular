@@ -1,0 +1,71 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+glob = require('glob')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:    
+    
+    @staticmethod
+    def find_tpl():
+        this.log(path.join(this.root_path, this.basic_config.app_path, '**', this.name+'*.'+this.ml))
+        this.tpl_url = glob.sync(path.join(this.root_path, this.basic_config.app_path, '**', this.name+'*.'+this.ml))[0]
+        this.tpl_url = path.relative(this.root_path, this.tpl_url)
+
+    @staticmethod
+    def find_modpath():
+        mod = this.basic_config.modules[this.module]
+        this.mod_path = glob.sync(path.join(this.root_path, mod)+'/*module*.'+this.ext)[0]
+
+    @staticmethod
+    def set_marker():
+        if this.ext == 'js':
+            this.marker = '/* Add new routes above */'
+        else:
+            this.marker = '# Add new routes above'
+
+    @staticmethod
+    def set_opts():
+        this.noctrl = this.options['noctrl'] or False
+        if typeof(this.ctrl) == 'undefined' or this.ctrl == '.':
+            this.ctrl = this.name+'_ctrl'
+
+    @staticmethod
+    def add_route():
+        if this.basic_config.router == 'ngRoute':
+            route = """
+    .when('<%= url %>', {
+        templateUrl: '<%= tpl %>',
+        controller: '<%= ctrl %>',
+    })
+"""
+        if this.basic_config.router == 'ui.router':
+            route = """
+    .state('<%= name %>', {
+        url: '<%= url %>',
+        templateUrl: '<%= tpl %>',<% if(!noctrl) {%>
+        controller: '<%= ctrl %>',<% } %>
+    })
+"""
+        route = this.engine(route, {url: this.url, tpl: this.tpl_url, name: this.name, noctrl: this.noctrl, ctrl: this.ctrl}).replace(/^\n/, '')
+        
+        this._ins_bmarker(this.mod_path, route, this.marker)
+
+class RouteGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('name')
+        self._arg('url')
+        self._arg('ctrl')
+        self._arg('module')
+        self._opt('noctrl')
+
+util.inherits(RouteGen, Base)
+mixin(RouteGen.prototype, BaseGen)
+mixin(RouteGen.prototype, GenExtra)
+
+JS('module.exports') = RouteGen

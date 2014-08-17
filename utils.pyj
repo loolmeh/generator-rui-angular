@@ -1,0 +1,278 @@
+path = require('path')
+Storage = require('./storage')
+findup = require('findup-sync')
+_ = require('lodash')
+glob = require('glob')
+file = require('yeoman-generator').file
+
+class BaseGen:
+
+    @staticmethod
+    def get_basic_config():
+        this.root_path = path.dirname(findup('.gen_config')) or process.cwd()
+        this.config = new Storage('rui-angular', path.join(this.root_path, '.gen_config'))
+        this.file = file
+
+        this.config.defaults({
+            indent: '    ',
+            router: 'ui.router',
+            modules: {},
+            basic_deps: [],
+            def_ext: 'js',
+            def_ml: 'html',
+            def_ss: 'css',
+            def_tst: 'expect',
+            app_path: 'app',
+            asset_path: 'assets',
+            dist_path: 'dist/dev',
+            })
+
+        this.basic_config = this.config.getAll()
+
+        basic_deps = this.basic_config.basic_deps
+        indent = this.basic_config.indent
+        this.basic_config.basic_deps_str = [indent + '\'' + dep for dep in basic_deps].join('\',\n') + '\','
+        bowerrc = path.join(this.root_path, '.bowerrc')
+        if this.file.exists(bowerrc):
+            this.basic_config.bower_path = this.file.readJSON(bowerrc).directory
+        else:
+            this.file.write(bowerrc, JSON.stringify({directory: 'bower_components'}, None, indent))
+            this.basic_config.bower_path = 'bower_components'
+        
+    @staticmethod
+    def _arg(arg):
+        meta = {
+                required: False,
+                type: String
+            }
+        this.argument(arg, meta)
+        
+        if arg == 'module': this.mod_req, this.mod_set = True, True
+        if arg == 'name': this.nm_req = True
+
+    @staticmethod
+    def _ask(attr):
+        this.attr = attr
+
+        if this.options[this.attr]:
+            setattr(this, this.attr, this.options[this.attr])
+
+        if not getattr(this, this.attr):
+            done = this.async()
+                    
+            prompts = {
+                type: 'input',
+                name: this.attr,
+                message: 'what do you want the ' + this.attr + ' to be?'
+                }
+            this.prompt(prompts,
+                def(answers):
+                    setattr(this, this.attr, getattr(answers, this.attr))
+                    done()
+                .bind(this)
+                    )
+
+    @staticmethod
+    def ask_name():
+        if this.nm_req:
+            this._ask('name')
+
+    @staticmethod
+    def set_path():
+        if this.path is '.' or typeof(this.path) is 'undefined':
+            this.path = path.relative(
+                this.root_path, process.cwd()
+            )
+        else:
+            this.path = path.relative(
+                this.root_path, path.join(process.cwd(), this.path)
+            )
+
+
+    @staticmethod
+    def set_module():
+        if typeof(this.mod_set) is not 'undefined' and this.mod_set:
+            if typeof(this.module) is 'undefined':
+                if this.path is '':
+                    if this.mod_req: this._ask('module')
+                else:
+                    current = path.relative(this.root_path, process.cwd())
+                    parent = process.cwd().split(path.sep)
+                    parent.pop()
+                    parent = path.relative(this.root_path, parent.join(path.sep))
+                    mod_path = ''
+                    wanted_mod = ''
+                    mods = this.basic_config.modules
+                    debugger
+                    _.forIn(mods,
+                    def(path_val, mod):
+                        nonlocal mod_path, wanted_mod
+                        if path_val is current:
+                            mod_path = path_val
+                            wanted_mod = mod
+                            return False
+                        elif path_val is parent:
+                            mod_path = path_val
+                            wanted_mod = mod
+                    )
+
+                    if wanted_mod:
+                        this.module = wanted_mod
+                    else:              
+                        if this.mod_req: this._ask('module')
+
+    @staticmethod
+    def _opt(opt):
+        this.option(opt,
+        {
+            type: Boolean,
+            defaults: False
+        }
+        )
+
+    @staticmethod
+    def _set_var(nm, lst):
+        vr = getattr(this.basic_config, 'def_'+nm)
+
+        for opt in lst:
+            if this.options[opt]: vr = opt
+
+        setattr(this, nm, vr)
+
+    @staticmethod
+    def set_ext():
+        this._set_var('ext', ['js', 'pyj', 'coffee'])
+
+    @staticmethod
+    def set_ml():
+        this._set_var('ml', ['html', 'pyml', 'jade'])
+
+    @staticmethod
+    def set_ss():
+        this._set_var('ss', ['css', 'sass', 'less'])
+
+    @staticmethod
+    def set_tst():
+        this._set_var('tst', ['assert', 'expect'])
+
+    @staticmethod
+    def set_index():
+        this.index = path.join(this.root_path, this.basic_config.app_path, 'index.'+this.ml)
+
+    @staticmethod
+    def set_index_ss():
+        this.index_ss = path.join(this.root_path, this.basic_config.app_path, 'index.'+this.ss)
+
+    @staticmethod
+    def _write_ss():
+        if this.ss == 'css':
+            ss_path = path.join(this.path, this.name+'-directive.'+this.ss)
+            this._write_tpl(ss_path, '')
+            this._ins_bmarker(this.index, this._headep(ss_path, 'style', ['data-concat="true"']), this.idx_marker)
+        elif this.ss == 'sass' or this.ss == 'less':
+            ss_path = path.join(this.path, '_'+this.name+'-directive.'+this.ss)
+            if this.ss == 'sass': eol = ''
+            elif this.ss == 'less': eol = ';'
+            this._ins_bmarker(this.index_ss, ['@import "', ss_path , '"', eol, '\n'].join(''), '// Add imports above')
+            this._write_tpl(ss_path, '')
+
+    @staticmethod
+    def _set_marker(nm, txt, ind_num):
+        ind = this.basic_config.indent
+        inds = [ind for i in range(1, ind_num+1)].join('')
+        if this.ml == 'pyml':
+            mrk = '# Add '+txt+' above'
+        elif this.ml == 'html':
+            mrk = '<!-- Add '+txt+' above -->'
+        elif this.ml == 'jade':
+            mrk = '// Add '+txt+' above'
+
+        setattr(this, nm, inds+mrk)
+
+    @staticmethod
+    def set_idx_marker():
+        this._set_marker('idx_marker', 'files', 2)
+
+    @staticmethod
+    def set_bower_marker():
+        this._set_marker('bower_marker', 'bower components', 2)
+
+    @staticmethod
+    def _clean_lines(pth):
+        content = this.file.read(pth)
+        content = content.replace(/\n\s*\n/g, '\n')
+        this.file.write(pth, content)
+
+    @staticmethod
+    def _raw_cp_tpls(src_glob, dst='', rename=''):
+        files = glob.sync(path.join(this.sourceRoot(), src_glob))
+        for file in files:
+            src = path.relative(this.sourceRoot(), file)
+            name = src.split(path.sep)[-1]
+            if rename: name = rename
+            dest = path.join(this.root_path, dst, name)
+            this.template(src, dest)
+
+    @staticmethod
+    def _copy_tpls(src_glob, dst):
+        files = glob.sync(path.join(this.sourceRoot(), src_glob))
+        js_headeps = []
+
+        for file in files:
+            src = path.relative(this.sourceRoot(), file)
+            name = this.name + '-' + src.split(path.sep)[-1]
+            this.template(src, path.join(this.root_path, dst, name))
+
+            if path.extname(name).replace('.', '') in ['js', 'pyj', 'coffee'] and 'spec' not in name:
+                js_headeps.push(path.join(dst, name.replace(/\..*$/, '.js')))
+
+        if js_headeps:
+            this._ins_bmarker(
+                this.index,
+                this._headeps(js_headeps, 'script', ['data-concat="true"']),
+                this.idx_marker
+                )
+
+    @staticmethod
+    def _write_tpl(filepath, content, data):
+        filepath = path.join(this.root_path, filepath)
+        this.write(filepath, this.engine(content, data))
+
+    @staticmethod
+    def _ins_bmarker(filepath, content, marker):
+        file_content = this.readFileAsString(filepath)
+        file_content = file_content.replace(marker, content+marker)
+        this.writeFileFromString(file_content, filepath)
+
+    @staticmethod
+    def _headep(file, type, extras=[]):
+        extras.unshift('')
+        indent = this.basic_config.indent
+        if type == 'script':
+            if this.ml == 'pyml' or this.ml == 'jade':
+                extras = extras.join(', ')
+                markup = 'script(src="'+file+'"'+extras+')'
+            elif this.ml == 'html':
+                extras = extras.join(' ')
+                markup = '<script src="'+file+'"'+extras+'></script>'
+        elif type == 'style':
+            if this.ml == 'pyml' or this.ml == 'jade':
+                extras = extras.join(', ')
+                markup = 'link(rel="stylesheet", href="'+file+'"'+extras+')'
+            elif this.ml == 'html':
+                extras = extras.join(' ')
+                markup = '<link rel="stylesheet" href="'+file+'"'+extras+'>'
+        markup = indent+indent+markup
+        markup += '\n'
+        return markup
+
+    @staticmethod
+    def _headeps(files, type, extras=['']):
+        markup = ''
+        for file in files:
+            markup += this._headep(file, type, extras)
+        return markup
+
+JS('module.exports') = {
+    BaseGen: BaseGen,
+}

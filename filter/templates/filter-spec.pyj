@@ -1,0 +1,17 @@
+"""
+Test for <%= name %> filter in the <%= module %> module.
+"""
+
+describe('<%= name %>',
+    def():
+        beforeEach(module('<%= module %>'))
+        it('should...', inject(
+            def($filter):
+                filter = $filter('<%= name %>')
+                <% if (tst === 'assert') { %>
+                assert(filter('input') == 'output')
+                <% } else { %>
+                expect(filter('input')).toEqual('output')
+                <% } %>
+        ))
+)

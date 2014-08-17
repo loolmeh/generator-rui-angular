@@ -1,0 +1,55 @@
+{
+  "name": "generator-rui-angular",
+  "version": "0.1.0",
+  "description": "Yeoman angular generator",
+  "license": "MIT",
+  "main": "app/index.js",
+  "repository": "https://github.com/loolmeh/generator-rui-angular",
+  "author": {
+    "name": "loolmeh",
+    "email": "",
+    "url": "https://github.com/loolmeh"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "app",
+    "filter"
+  ],
+  "keywords": [
+    "yeoman-generator",
+    "angularjs",
+    "rapydscript",
+    "rapydml",
+    "coffeescript",
+    "jade",
+    "bootstrap",
+    "sass",
+    "animate.css",
+    "grunt",
+    "angular-ui",
+    "ui-router"
+  ],
+  "dependencies": {
+    "yeoman-generator": "~0.16.0",
+    "chalk": "~0.4.0",
+    "yosay": "^0.1.0"
+  },
+  "devDependencies": {
+    "file-utils": "^0.2.1",
+    "findup-sync": "^0.1.3",
+    "glob": "^4.0.6",
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "load-grunt-tasks": "^1.0.0",
+    "grunt-rapydscript": "~0.0.1",
+    "mocha": "*"
+  },
+  "peerDependencies": {
+    "yo": ">=1.0.0"
+  }
+}

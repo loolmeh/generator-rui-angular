@@ -1,0 +1,36 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+chalk = require('chalk')
+genutils = require('../utils')
+util = require('util')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+
+class GenExtra:
+
+    @staticmethod
+    def register_module():
+        this.basic_config.modules[this.name] = this.path
+        this.config.set('modules', this.basic_config.modules)
+
+    @staticmethod
+    def copy_template():
+        this._copy_tpls('*.'+this.ext, this.path)
+
+class FilterGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('name')
+        self._arg('path')
+        self._opt('js')
+        self._opt('pyj')
+        self._opt('coffee')
+
+util.inherits(FilterGen, Base)
+mixin(FilterGen.prototype, BaseGen)
+mixin(FilterGen.prototype, GenExtra)
+
+JS('module.exports') = FilterGen

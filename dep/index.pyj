@@ -1,0 +1,134 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+glob = require('glob')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:
+
+    @staticmethod
+    def set_marker():
+        if this.ext == 'js':
+            this.marker = '/* Add more dependencies above */'
+        else:
+            this.marker = '# Add more dependencies above'
+
+    @staticmethod
+    def ask_args():
+        if typeof(this.cmd) == 'undefined': this._ask('cmd')
+        if typeof(this.deps) == 'undefined': this._ask('deps')
+        if typeof(this.module) == 'undefined' and typeof(this.mods) == 'undefined': this._ask('mods')
+
+    @staticmethod
+    def set_args():
+        deps = this.deps
+        deps = ['\''+dep+'\'' for dep in deps.split(',')]
+        this.deps = deps
+        if typeof(this.mods) == 'undefined':
+            this.mods = [this.module]
+        else:
+            this.mods = this.mods.split(',')
+    
+    @staticmethod
+    def set_opts():
+        this.all = this.options['all'] or False
+        this.conf = this.options['conf'] or False
+
+    @staticmethod
+    def set_brace():
+        # fix coffee files' issue with dangling [
+        if this.ext == 'coffee':
+            this.br = '[\\'
+        else:
+            this.br = '['
+
+    @staticmethod
+    def find_modpaths():
+        if this.all:
+            this.mod_paths = \
+                glob.sync(path.join(this.root_path, this.app_path, '*module*.'+this.ext))\
+                .concat(
+                glob.sync(path.join(this.root_path, this.app_path, '**', '*module*.'+this.ext))
+                )
+        elif typeof(this.mods) == 'undefined':
+            mpath = this.basic_config.modules[this.module]
+            this.mod_paths = [glob.sync(path.join(this.root_path, mpath, '*module*.'+this.ext))[0]]
+        elif this.mods:
+            this.mod_paths = []
+            for mod in this.mods:
+                mpath = this.basic_config.modules[mod]
+                this.mod_paths.push(glob.sync(path.join(this.root_path, mpath, '*module*.'+this.ext))[0])
+        
+    @staticmethod
+    def _get_deps(filepath, marker):
+        this.file_content = this.readFileAsString(filepath)
+        this.deps_orig = this.file_content.match(/\.module\([\s\S]*\]/)[0]
+        deps = this.deps_orig.replace(/\.module\(.*$/m, '').replace(marker, '').replace(/\s*/g, '').replace(/\[|\]/g, '').replace(/\\/g, '').split(',')
+        return deps
+
+    @staticmethod
+    def _set_deps(filepath, deps):
+        new_deps = '    '+this.br+'\n'+['    '+dep for dep in deps].join(',\n')+this.marker+'\n    ]'
+        new_deps = this.deps_orig.replace(/.*\[.*\n[\s\S]*.*\]/, new_deps)
+        this.file_content = this.file_content.replace(/\.module\([\s\S]*\]/, new_deps)
+        this.writeFileFromString(this.file_content, filepath)
+
+    @staticmethod
+    def _add_deps():
+        for modpath in this.mod_paths:
+            deps = this._get_deps(modpath, this.marker)
+            deps.unshift(*this.deps)
+            this._set_deps(modpath, deps)
+
+    @staticmethod
+    def _remove(arr, item):
+        idx = arr.indexOf(item)
+        if idx != -1: arr.splice(idx, 1)
+
+    @staticmethod
+    def _remove_deps():
+        for modpath in this.mod_paths:
+            deps = this._get_deps(modpath, this.marker)
+            for dep in this.deps: this._remove(deps, dep)
+            this._set_deps(modpath, deps)
+
+    @staticmethod
+    def handle_cmd():
+        if this.cmd == 'add':
+            this._add_deps()
+        elif this.cmd == 'remove':
+            this._remove_deps()
+
+    @staticmethod
+    def handle_conf():
+        basic_deps = this.basic_config.basic_deps
+        deps = this.deps
+        deps = [dep.replace(/'/g, '') for dep in deps]
+        if this.conf and this.cmd == 'add':
+            basic_deps = basic_deps.concat()
+            this.config.set('basic_deps', basic_deps)
+        elif this.conf and this.cmd == 'remove':
+            for dep in deps:
+                this._remove(basic_deps, dep)
+            this.config.set('basic_deps', basic_deps)              
+
+class DepGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('cmd')
+        self._arg('deps')
+        self._arg('mods')
+        self._opt('all')
+        self._opt('conf')
+        self.mod_set = True
+        
+
+util.inherits(DepGen, Base)
+mixin(DepGen.prototype, BaseGen)
+mixin(DepGen.prototype, GenExtra)
+
+JS('module.exports') = DepGen

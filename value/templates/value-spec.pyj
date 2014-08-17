@@ -1,0 +1,18 @@
+"""
+Test for <%= name %> value in the <%= module %> module.
+"""
+
+describe('<%= name %> value',
+    def():
+        beforeEach(module('<%= module %>'))
+        
+        it('should...', inject(
+            def(<%= name %>):
+                <% if (tst === 'assert') { %>
+                assert(<% name %> == 42)
+                <% } else { %>
+                expect(<% name %>).toEqual(42)
+                <% } %>
+        ))
+
+)

@@ -1,0 +1,6 @@
+"""
+<%= name %> value in the <%= module %>
+"""
+
+angular.module('<%= module %>')
+.value('<%= name %>', 42)

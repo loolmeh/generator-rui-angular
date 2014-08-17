@@ -1,0 +1,23 @@
+"""
+<%= name %> provider in the <%= module %>
+"""
+
+angular.module('<%= module %>')
+.provider('<%= name %>',
+    def():
+        # private vars
+        sth = 42
+        
+        # constructor
+        def Thing():
+            this.do_sth = def(): return sth
+
+        # public config api
+        def set_sth(s):
+            nonlocal sth
+            sth = s
+
+        this.set_sth = set_sth
+        
+        this.$get = def(): return new Thing()
+)

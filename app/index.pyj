@@ -1,0 +1,317 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:
+
+    @staticmethod
+    def _ask_choices(qst, lst, vr, tp='list'):
+        done = this.async()
+
+        prompts = [{
+        type: tp,
+        name: vr,
+        message: qst,
+        default: lst[0],
+        choices: lst
+        }]
+
+        this.prompt(prompts,
+            def(ans):
+                setattr(this, vr, getattr(ans, vr))
+                done()
+            .bind(this)
+        )
+
+    @staticmethod
+    def _ask_in(qst, df, vr, tp='input'):
+        if typeof(df) == 'boolean': tp = 'confirm'
+
+        done = this.async()
+
+        prompts = [{
+        type: tp,
+        name: vr,
+        message: qst,
+        default: df
+        }]
+
+        this.prompt(prompts,
+            def(ans):
+                setattr(this, vr, getattr(ans, vr))
+                done()
+            .bind(this)
+        )
+
+    @staticmethod
+    def ask_app_name():
+        this._ask_in('app name:', '', 'name')
+
+    @staticmethod
+    def ask_author():
+        this._ask_in('author:', '', 'author')
+
+    @staticmethod
+    def ask_license():
+        this._ask_choices('license:', ['MIT', 'BSD', 'GPL', ''], 'license')
+
+    @staticmethod
+    def set_year():
+        date = new Date()
+        this.year = date.getFullYear()
+
+    @staticmethod
+    def ask_ext():
+        this._ask_choices('scripting language:', ['pyj', 'coffee', 'js'], 'ext')
+
+    @staticmethod
+    def ask_ml():
+        this._ask_choices('markup language:', ['pyml', 'jade', 'html'], 'ml')
+
+    @staticmethod
+    def ask_ss():
+        this._ask_choices('styling language:', ['sass', 'less', 'css'], 'ss')
+
+    @staticmethod
+    def ask_router():
+        this._ask_choices('routing module:', ['ui.router', 'ngRoute'], 'router')
+
+    @staticmethod
+    def ask_tst():
+        this._ask_choices('testing style:', ['assert', 'expect'], 'tst')
+
+    @staticmethod
+    def ask_browsers():
+        this._ask_choices('browsers used to run tests:', ['phantomjs', 'chrome', 'firefox'], 'browsers', 'checkbox')
+
+    @staticmethod
+    def ask_chrome_bin():
+        if this._in_brows('chrome'):
+            this._ask_in('command/binary to launch chrome:', 'chromium-browser', 'chrome_bin')
+
+    @staticmethod
+    def ask_app_path():
+        this._ask_in('source code\'s root path:', 'app', 'app_path')
+
+    @staticmethod
+    def ask_dist_path():
+        this._ask_in('build path:', 'dist', 'dist_path')
+
+    @staticmethod
+    def ask_bower_path():
+        this._ask_in('bower path:', 'bower_components', 'bower_path')
+
+    @staticmethod
+    def ask_asset_path():
+        this._ask_in('asset path:', 'assets', 'asset_path')
+
+    @staticmethod
+    def ask_e2e():
+        this._ask_in('add protractor e2e test settings:', True, 'protractor')
+
+    @staticmethod
+    def ask_cdn():
+        this._ask_in('add cdn replacements to final build:', False, 'cdn')
+
+    @staticmethod
+    def ask_cdn_data():
+        if this.cdn:
+            this._ask_choices('cdn data:', ['google', 'cdnjs', 'jsdelivr'], 'cdn_data', 'checkbox')
+
+    @staticmethod
+    def _in_mods(mod):
+        return mod in this.extra_mods
+
+    @staticmethod
+    def _in_brows(browser):
+        return browser in this.browsers 
+
+    @staticmethod
+    def _in_cdn(data):
+        return data in this.cdn_data
+
+    @staticmethod
+    def ask_extra_mods():
+        this._ask_choices('add extra modules:',
+            [
+            'ui.bootstrap',
+            'bootstrap',
+            'gettext',
+            'lodash',
+            'animate',
+            'ngAnimate',
+            'ui.utils',
+            'ngAria',
+            'ngCookies',
+            'ngMessages',
+            'ngResource',
+            'ngSanitize',
+            'ngTouch',
+            ],
+            'extra_mods',
+            'checkbox'
+        )
+
+    @staticmethod
+    def ask_mod():
+        this._ask_in('create main module now?', True, 'mod_now')
+
+    @staticmethod
+    def ask_mod_name():
+        if this.mod_now:
+            this._ask_in('main module name:', 'app', 'mod_name')
+
+    @staticmethod
+    def ask_mod_path():
+        if this.mod_now:
+            this._ask_in('main module prefix path:', '', 'mod_path')
+
+    @staticmethod
+    def ask_install():
+        this._ask_in('install dependencies now?', True, 'install_now')
+
+    @staticmethod
+    def set_idx():
+        this.index = path.join(this.root_path, this.app_path, 'index.'+this.ml)
+
+    @staticmethod
+    def set_idx_mrk():
+        this._set_marker('idx_marker', 'files', 2)
+
+    @staticmethod
+    def set_bower_mrk():
+        this._set_marker('bower_marker', 'bower components', 2)
+
+    @staticmethod
+    def copy_templates():
+        this._raw_cp_tpls('index.'+this.ml, this.app_path)
+        this._raw_cp_tpls('index.'+this.ss, this.app_path)
+        this.file.delete('.bowerrc')
+        this._raw_cp_tpls('.bowerrc')
+        this._raw_cp_tpls('.gitignore')
+        this._raw_cp_tpls('.editorconfig')
+        if this.ext == 'js': this._raw_cp_tpls('.jshintrc')
+        if this.protractor: this._raw_cp_tpls('protractor.conf.js')
+        this._raw_cp_tpls('README.md')
+        if this.license: this._raw_cp_tpls('LICENSE-'+this.license, '', 'LICENSE')
+        this._raw_cp_tpls('bower.json')
+        this._raw_cp_tpls('Gruntfile.js')
+        this._raw_cp_tpls('package.json')
+        if this._in_mods('gettext'): this.mkdir('po')
+        this.mkdir(this.dist_path)
+        this.mkdir(path.join(this.dist_path, 'dev'))
+        this.mkdir(this.asset_path)
+
+    @staticmethod
+    def _bowerdep(ref):
+        if 'js' in ref: type = 'script'
+        if 'css' in ref: type = 'style'
+
+        this._ins_bmarker(
+            this.index,
+            this._headep(path.join(this.bower_path, ref), type, ['data-copy="true"']),
+            this.bower_marker
+        )
+
+    @staticmethod
+    def _bowerdeps(refs):
+        for ref in refs:
+            this._bowerdep(ref)
+
+    @staticmethod
+    def add_bowerdeps():
+        deps = []
+        deps.push('angular/angular.js')
+        if this.router == 'ngRoute': deps.push('angular-route/angular-route.js')
+        if this.router == 'ui.router': deps.push('ui-router/release/angular-ui-router.js')
+        if this._in_mods('bootstrap') and this.ss == 'css':
+            deps.push('bootstrap/dist/css/bootstrap.css')
+        if this._in_mods('ui.bootstrap'):
+            deps.push('angular-bootstrap/ui-bootstrap.js')
+            deps.push('angular-bootstrap/ui-bootstrap-tpls.js')
+        if this._in_mods('animate') and (this.ss == 'css' or this.ss == 'less'):
+            deps.push('animate.css/animate.css')
+        if this._in_mods('ngAnimate'): deps.push('angular-animate/angular-animate.js')
+        if this._in_mods('gettext'): deps.push('angular-gettext/dist/angular-gettext.js')
+        if this._in_mods('lodash'): deps.push('lodash/dist/lodash.compat.js')
+        if this._in_mods('ui.utils'): deps.push('angular-ui-utils/ui-utils.js')
+        if this._in_mods('ngAria'): deps.push('angular-aria/angular-aria.js')
+        if this._in_mods('ngCookies'): deps.push('angular-cookies/angular-cookies.js')
+        if this._in_mods('ngMessages'): deps.push('angular-messages/angular-messages.js')
+        if this._in_mods('ngResource'): deps.push('angular-resource/angular-resource.js')
+        if this._in_mods('ngSanitize'): deps.push('angular-sanitize/angular-sanitize.js')
+        if this._in_mods('ngTouch'): deps.push('angular-touch/angular-touch.js')
+
+        this._bowerdeps(deps)
+
+    @staticmethod
+    def _arr_remove(items, arr):
+        for item in items:
+            while (i = arr.indexOf(item)) != -1:
+                arr.splice(i, 1)
+        
+    @staticmethod
+    def set_config():
+        this.basic_config.def_ext = this.ext
+        this.basic_config.def_ml = this.ml
+        this.basic_config.def_ss = this.ss
+        this.basic_config.def_tst = this.tst
+        this.basic_config.router = this.router
+        this._arr_remove(['lodash', 'bootstrap', 'animate'], this.extra_mods)
+        this.basic_config.basic_deps = this.extra_mods
+        this.basic_config.app_path = this.app_path
+        this.dist_path = path.join(this.dist_path, 'dev')
+        this.basic_config.dist_path = this.dist_path
+        this.basic_config.asset_path = this.asset_path
+        del this.basic_config.bower_path
+        del this.basic_config.basic_deps_str
+
+        this.config.set(this.basic_config)
+        this.file.write('.gen_config', JSON.stringify({'rui-angular': this.basic_config}, None, 4))
+
+    @staticmethod
+    def create_mod():
+        if this.mod_now:
+            this.invoke('rui-angular:module', {
+                args: [
+                    this.mod_name, 
+                    path.join(this.app_path, this.mod_path)
+                    ]
+                })
+
+    @staticmethod
+    def install_deps():
+        if this.install_now:
+            this.installDependencies()
+
+class RuiGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        this.on('end',
+            def():
+                this._clean_lines('bower.json')
+                this._clean_lines('package.json')
+                this._clean_lines('Gruntfile.js')
+                if this._in_mods('gettext'):
+                    this._ins_bmarker(
+                        this.index,
+                        this._headep(path.join(this.app_path, 'translations.js'), 'script', ['data-remove="true"']),
+                        this.idx_marker
+                        )
+                if this.install_now:
+                    this.spawnCommand('npm', ['install', '-g', 'grunt-cli'])
+                    if this.protractor:
+                        this.spawnCommand('npm', ['install', '-g', 'protractor'])
+                        this.spawnCommand('webdriver-manager', ['update'])
+        )
+
+util.inherits(RuiGen, Base)
+mixin(RuiGen.prototype, BaseGen)
+mixin(RuiGen.prototype, GenExtra)
+
+JS('module.exports') = RuiGen

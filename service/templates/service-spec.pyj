@@ -1,0 +1,15 @@
+
+describe('<%= name %>',
+    def():
+        beforeEach(module('<%= module %>'))
+        
+        it('should...', inject(
+            def(<%= name %>):
+                <% if (tst === 'assert') { %>
+                assert(<%= name %>() == 42)
+                <% } else { %>
+                expect(<%= name %>()).toEqual(42)
+                <% } %>
+        ))
+
+)

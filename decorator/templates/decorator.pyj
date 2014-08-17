@@ -1,0 +1,13 @@
+"""
+decorator for the <%= name %> service in the <%= module %>
+"""
+
+angular.module('<%= module %>')
+.config(
+    def($provide):
+        $provide.decorator('<%= name %>',
+            def($delegate):
+                # do something to the $delegate
+                return $delegate
+        )
+)

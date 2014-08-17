@@ -1,0 +1,240 @@
+<% if (_in_mods('bootstrap')) { %>
+// import bootstrap sass partials uncomment what you need to use
+
+// Core variables and mixins
+@import "bootstrap/variables"
+@import "bootstrap/mixins"
+
+// override bootstrap vars here
+$icon-font-path: "assets/fonts/"
+
+// Reset and dependencies
+@import "bootstrap/normalize"
+@import "bootstrap/print"
+@import "bootstrap/glyphicons"
+
+// Core CSS
+// @import "bootstrap/scaffolding"
+// @import "bootstrap/type"
+// @import "bootstrap/code"
+// @import "bootstrap/grid"
+// @import "bootstrap/tables"
+// @import "bootstrap/forms"
+// @import "bootstrap/buttons"
+
+// Components
+// @import "bootstrap/component-animations"
+// @import "bootstrap/dropdowns"
+// @import "bootstrap/button-groups"
+// @import "bootstrap/input-groups"
+// @import "bootstrap/navs"
+// @import "bootstrap/navbar"
+// @import "bootstrap/breadcrumbs"
+// @import "bootstrap/pagination"
+// @import "bootstrap/pager"
+// @import "bootstrap/labels"
+// @import "bootstrap/badges"
+// @import "bootstrap/jumbotron"
+// @import "bootstrap/thumbnails"
+// @import "bootstrap/alerts"
+// @import "bootstrap/progress-bars"
+// @import "bootstrap/media"
+// @import "bootstrap/list-group"
+// @import "bootstrap/panels"
+// @import "bootstrap/responsive-embed"
+// @import "bootstrap/wells"
+// @import "bootstrap/close"
+
+// Components w/ JavaScript
+// @import "bootstrap/modals"
+// @import "bootstrap/tooltip"
+// @import "bootstrap/popovers"
+// @import "bootstrap/carousel"
+
+// Utility classes
+// @import "bootstrap/utilities"
+// @import "bootstrap/responsive-utilities"
+<% } %>
+<% if (_in_mods('animate')) { %>
+// import animate-sass partials
+
+@import "helpers/mixins"
+@import "helpers/settings"
+
+// it's off by default which is terrible
+// Fade Enter
+$use-fadeIn 			:	true
+$use-fadeInUp 			:	true
+$use-fadeInUpBig 		:	true
+$use-fadeInDown 		:	true
+$use-fadeInDownBig 		:	true
+$use-fadeInLeft 		:	true
+$use-fadeInLeftBig 		:	true
+$use-fadeInRight 		:	true
+$use-fadeInRightBig 	:	true
+// Fade Exit
+$use-fadeOut			:   true
+$use-fadeOutUp			:	true
+$use-fadeOutUpBig   	:	true
+$use-fadeOutDown		:	true
+$use-fadeOutDownBig 	:	true
+$use-fadeOutLeft		:	true
+$use-fadeOutLeftBig 	:	true
+$use-fadeOutRight		:	true
+$use-fadeOutRightBig	:	true
+// Bounce Enter
+$use-bounceIn			:	true
+$use-bounceInUp			: 	true
+$use-bounceInDown 		: 	true
+$use-bounceInLeft 		: 	true
+$use-bounceInRight 		: 	true
+// Bounce Exit
+$use-bounceOut			:	true
+$use-bounceOutUp		: 	true
+$use-bounceOutDown 		: 	true
+$use-bounceOutLeft 		: 	true
+$use-bounceOutRight 	: 	true
+// Rotate Enter
+$use-rotateIn 			:	true
+$use-rotateInUpLeft 	: 	true
+$use-rotateInUpRight 	: 	true
+$use-rotateInDownLeft 	: 	true
+$use-rotateInDownRight 	: 	true
+// Rotate Exit
+$use-rotateOut 			:	true
+$use-rotateOutUpLeft 	: 	true
+$use-rotateOutUpRight 	: 	true
+$use-rotateOutDownLeft 	: 	true
+$use-rotateOutDownRight : 	true
+// Flippers
+$use-flip				:	true
+$use-flipInX			:	true
+$use-flipInY			:	true
+$use-flipOutX			:	true
+$use-flipOutY			:	true
+// Lightspeed
+$use-lightSpeedIn 		:	true
+$use-lightSpeedOut 		:	true
+// Attention Seekers
+$use-bounce				:	true
+$use-flash				:	true
+$use-pulse				:	true
+$use-wiggle				:	true
+$use-swing				:	true
+$use-shake				:	true
+$use-tada				:	true
+$use-wobble				:	true
+// Special
+$use-hinge				:	true
+$use-rollIn				: 	true
+$use-rollOut 			:	true
+// Zoom In
+$use-zoomIn 			:	true
+$use-zoomInDown 		:	true
+$use-zoomInLeft 		:	true
+$use-zoomInRight 		:	true
+$use-zoomInUp 			:	true
+// Zoom Out
+$use-zoomOut			:	true
+$use-zoomOutDown		:	true
+$use-zoomOutLeft		:	true
+$use-zoomOutRight		:	true
+$use-zoomOutUp			:	true
+// override animate-sass vars here
+
+// uncomment these to include them
+// ATTENTION
+// @import "animations/attention-seekers/bounce"
+// @import "animations/attention-seekers/flash"
+// @import "animations/attention-seekers/pulse"
+// @import "animations/attention-seekers/shake"
+// @import "animations/attention-seekers/swing"
+// @import "animations/attention-seekers/wiggle"
+// @import "animations/attention-seekers/wobble"
+// @import "animations/attention-seekers/tada"
+
+// BOUNCE
+// @import "animations/bounce-enter/bounceIn"
+// @import "animations/bounce-enter/bounceInDown"
+// @import "animations/bounce-enter/bounceInLeft"
+// @import "animations/bounce-enter/bounceInRight"
+// @import "animations/bounce-enter/bounceInUp"
+// @import "animations/bounce-exit/bounceOut"
+// @import "animations/bounce-exit/bounceOutDown"
+// @import "animations/bounce-exit/bounceOutLeft"
+// @import "animations/bounce-exit/bounceOutRight"
+// @import "animations/bounce-exit/bounceOutUp"
+
+// FADE
+// @import	"animations/fade-enter/fadeIn"
+// @import "animations/fade-enter/fadeInDown"
+// @import "animations/fade-enter/fadeInDownBig"
+// @import "animations/fade-enter/fadeInLeft"
+// @import "animations/fade-enter/fadeInLeftBig"
+// @import "animations/fade-enter/fadeInRight"
+// @import "animations/fade-enter/fadeInRightBig"
+// @import "animations/fade-enter/fadeInUp"
+// @import "animations/fade-enter/fadeInUpBig"
+// @import "animations/fade-exit/fadeOut"
+// @import "animations/fade-exit/fadeOutDown"
+// @import "animations/fade-exit/fadeOutDownBig"
+// @import "animations/fade-exit/fadeOutLeft"
+// @import "animations/fade-exit/fadeOutLeftBig"
+// @import "animations/fade-exit/fadeOutRight"
+// @import "animations/fade-exit/fadeOutRightBig"
+// @import "animations/fade-exit/fadeOutUp"
+// @import "animations/fade-exit/fadeOutUpBig"
+
+// FLIP
+// @import "animations/flippers/flip"
+// @import "animations/flippers/flipInX"
+// @import "animations/flippers/flipInY"
+// @import "animations/flippers/flipOutX"
+// @import "animations/flippers/flipOutY"
+
+// LIGHTSPEED
+// @import "animations/lightspeed/lightSpeedIn"
+// @import "animations/lightspeed/lightSpeedOut"
+
+// ROTATE
+// @import "animations/rotate-enter/rotateIn"
+// @import "animations/rotate-enter/rotateInDownLeft"
+// @import "animations/rotate-enter/rotateInDownRight"
+// @import "animations/rotate-enter/rotateInUpLeft"
+// @import "animations/rotate-enter/rotateInUpRight"
+// @import "animations/rotate-exit/rotateOut"
+// @import "animations/rotate-exit/rotateOutDownLeft"
+// @import "animations/rotate-exit/rotateOutDownRight"
+// @import "animations/rotate-exit/rotateOutUpLeft"
+// @import "animations/rotate-exit/rotateOutUpRight"
+
+// SPECIAL
+// @import "animations/special/hinge"
+// @import "animations/special/rollIn"
+// @import "animations/special/rollOut"
+
+// ZOOM
+// @import "animations/zoom-enter/zoomIn"
+// @import "animations/zoom-enter/zoomInDown"
+// @import "animations/zoom-enter/zoomInLeft"
+// @import "animations/zoom-enter/zoomInRight"
+// @import "animations/zoom-enter/zoomInUp"
+// @import "animations/zoom-exit/zoomOut"
+// @import "animations/zoom-exit/zoomOutDown"
+// @import "animations/zoom-exit/zoomOutLeft"
+// @import "animations/zoom-exit/zoomOutRight"
+// @import "animations/zoom-exit/zoomOutUp"
+
+body
+    -webkit-backface-visibility: hidden
+
+.animated
+    @include animate-prefixer(animation-duration, $base-duration)
+    @include animate-prefixer(animation-fill-mode, both)
+
+    &.hinge
+        @include animate-prefixer(animation-duration, $base-duration * 2)
+<% } %>
+// import your own partials here
+
+// Add imports above

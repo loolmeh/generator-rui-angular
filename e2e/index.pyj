@@ -1,0 +1,29 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:
+    
+    @staticmethod
+    def copy_template():
+        this._copy_tpls('*.'+this.ext, this.path)
+
+class E2EGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('name')
+        self._arg('path')
+        self._opt('js')
+        self._opt('pyj')
+        self._opt('coffee')
+
+util.inherits(E2EGen, Base)
+mixin(E2EGen.prototype, BaseGen)
+mixin(E2EGen.prototype, GenExtra)
+
+JS('module.exports') = E2EGen

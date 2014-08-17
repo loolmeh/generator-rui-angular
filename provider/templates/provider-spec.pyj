@@ -1,0 +1,21 @@
+
+describe('<%= name %>', 
+    def():
+        beforeEach(
+            def():
+                module('<%= module %>')
+                <%= module %>.config(
+                    def(<%= name %>Provider):
+                        <%= name %>Provider.set_sth = 42
+                )
+        )
+        
+        it('should...', inject(
+            def(<%= name %>):
+                <% if (tst === 'assert') { %>
+                assert(<%= name %> == 42)
+                <% } else { %>
+                expect(<%= name %>).toEqual(42)
+                <% } %>
+        ))
+)

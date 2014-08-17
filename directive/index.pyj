@@ -1,0 +1,74 @@
+yeoman = require('yeoman-generator')
+path = require('path')
+genutils = require('../utils')
+util = require('util')
+
+BaseGen = genutils.BaseGen
+Base = yeoman.generators.Base
+
+class GenExtra:
+
+    @staticmethod
+    def set_opts():
+        this.no_tpl = this.options['notpl'] or False
+        this.no_css = this.options['nocss'] or False
+
+    @staticmethod
+    def set_ml_tpl():
+        if this.ml == 'html':
+            this.ml_tpl = """
+<div>
+the <%= name %> directive 
+</div>
+"""
+        if this.ml == 'pyml':
+            this.ml_tpl = """
+div:
+    the <%= name %> directive
+"""
+
+        if this.ml == 'jade':
+            this.ml_tpl = """
+div
+    the <%= name %> directive
+"""
+        this.ml_tpl = this.engine(this.ml_tpl, {name: this.name}).replace(/^\n/, '')
+
+    @staticmethod
+    def _escape(val):
+        return val.replace(/\n/g, "\\n")
+    
+    @staticmethod
+    def copy_template():
+        if not this.no_tpl:
+            this.tpl_path = path.join(this.path, this.name+'-directive.'+this.ml)
+            this._write_tpl(this.tpl_path, this.ml_tpl)
+
+        this._copy_tpls('*.'+this.ext, this.path)
+
+    @staticmethod
+    def write_ss():
+        if not this.no_css:
+            this._write_ss()
+
+class DirGen:
+
+    def __init__(self):
+        Base.apply(self, arguments)
+        self._arg('name')
+        self._arg('path')
+        self._arg('module')
+        self._opt('js')
+        self._opt('pyj')
+        self._opt('coffee')
+        self._opt('notpl')
+        self._opt('nocss')
+        self._opt('pyml')
+        self._opt('html')
+        self._opt('jade')
+
+util.inherits(DirGen, Base)
+mixin(DirGen.prototype, BaseGen)
+mixin(DirGen.prototype, GenExtra)
+
+JS('module.exports') = DirGen
